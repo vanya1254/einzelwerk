@@ -1,29 +1,25 @@
 "use client";
 
-import { zodResolver } from "@hookform/resolvers/zod";
 import React from "react";
-import { useForm, FieldPath, Control } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
 import { z } from "zod";
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "../ui/form";
+import { Form } from "../ui/form";
 import { Button } from "../ui/button";
-import { Input } from "../ui/input";
-import MultipleSelector, { Option } from "../ui/multiple-selector";
-import { Checkbox } from "../ui/checkbox";
-import { tree } from "next/dist/build/templates/app-page";
+import { Option } from "../ui/multiple-selector";
+
+import {
+  CustomCheckbox,
+  CustomFileUpload,
+  CustomFormField,
+  CustomSelect,
+} from "../";
 
 const phoneRegex = new RegExp(
   /^((8|\+7)[\- ]?)?(\(?\d{3}\)?[\- ]?)?[\d\- ]{7,10}$/
 );
 
-const formSchema = z.object({
+export const formSchema = z.object({
   name: z.string().min(1, { message: "Please enter name" }),
   phone: z.string().regex(phoneRegex, {
     message: "Please enter valid phone number: +7 999 999-99-99",
@@ -33,6 +29,7 @@ const formSchema = z.object({
     .custom<Option>()
     .array()
     .min(1, { message: "Please choose option(s)" }),
+  files: z.custom<FileList>(),
   agree: z
     .boolean()
     .refine((val) => val, { message: "Please check the agreement" }),
@@ -46,6 +43,7 @@ export const CustomForm: React.FC = () => {
       phone: "",
       email: "",
       skills: [],
+      files: undefined,
       agree: false,
     },
   });
@@ -56,26 +54,40 @@ export const CustomForm: React.FC = () => {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="">
+      <form
+        onSubmit={form.handleSubmit(onSubmit)}
+        className="flex w-[640px] flex-col gap-4 p-10 rounded-[32px] bg-white"
+      >
+        <div className="flex w-full flex-col gap-4">
+          <h1 className="text-gray-950 font-semibold text-[40px]/[44px]">
+            Drop us a line
+          </h1>
+          <p className="text-xl/[30px] tracking-[-0.2px]">
+            Our documentary campaigns feature leading figures, organisations and
+            leaders, in open and candid discussions.
+          </p>
+        </div>
         <CustomFormField
           name="name"
           placeholder="Name"
           inputType="name"
           formControl={form.control}
         />
-        <CustomFormField
-          name="phone"
-          placeholder="Phone"
-          inputType="phone"
-          formControl={form.control}
-        />
-        <CustomFormField
-          name="email"
-          placeholder="Email"
-          inputType="email"
-          formControl={form.control}
-        />
-        <CustomFormSelect
+        <div className="flex w-full gap-4">
+          <CustomFormField
+            name="phone"
+            placeholder="Phone"
+            inputType="phone"
+            formControl={form.control}
+          />
+          <CustomFormField
+            name="email"
+            placeholder="Email"
+            inputType="email"
+            formControl={form.control}
+          />
+        </div>
+        <CustomSelect
           name="skills"
           placeholder="Your skills"
           formControl={form.control}
@@ -85,121 +97,16 @@ export const CustomForm: React.FC = () => {
             { value: "str333ing", label: "str333ing" },
           ]}
         />
-        <CustomFormCheckbox
+        <CustomFileUpload formControl={form.control} />
+        <CustomCheckbox
           name="agree"
           label="I’m agree with every data you collect"
           formControl={form.control}
         />
-        <Button>Send</Button>
+        <Button className="rounded-full p-0 pl-10 pr-10 text-lg/[26px] font-medium bg-blue-600 hover:bg-blue-500">
+          Send
+        </Button>
       </form>
     </Form>
-  );
-};
-
-interface CustomFormFieldPropsT {
-  name: FieldPath<z.infer<typeof formSchema>>;
-  label?: string;
-  placeholder: string;
-  description?: string;
-  inputType?: string;
-  formControl: Control<z.infer<typeof formSchema>, any>;
-}
-
-const CustomFormField: React.FC<CustomFormFieldPropsT> = ({
-  name,
-  label,
-  placeholder,
-  description,
-  inputType,
-  formControl,
-}) => {
-  return (
-    <FormField
-      control={formControl}
-      name={name}
-      render={({ field }) => (
-        <FormItem>
-          {label && <FormLabel>{label}</FormLabel>}
-          <FormControl>
-            {
-              // @ts-ignore
-              <Input
-                placeholder={placeholder}
-                type={inputType || "text"}
-                {...field}
-              />
-            }
-          </FormControl>
-          {description && <FormDescription>{description}</FormDescription>}
-          <FormMessage />
-        </FormItem>
-      )}
-    />
-  );
-};
-
-interface CustomFormSelectPropsT {
-  name: FieldPath<z.infer<typeof formSchema>>;
-  label?: string;
-  placeholder: string;
-  formControl: Control<z.infer<typeof formSchema>, any>;
-  options: Option[];
-}
-
-const CustomFormSelect: React.FC<CustomFormSelectPropsT> = ({
-  name,
-  label,
-  placeholder,
-  formControl,
-  options,
-}) => {
-  return (
-    <FormField
-      control={formControl}
-      name={name}
-      render={({ field }) => (
-        <FormItem>
-          {label && <FormLabel>{label}</FormLabel>}
-          <FormControl>
-            {
-              // @ts-ignore
-              <MultipleSelector
-                options={options}
-                placeholder={placeholder}
-                {...field}
-              />
-            }
-          </FormControl>
-          <FormMessage />
-        </FormItem>
-      )}
-    />
-  );
-};
-
-interface CustomFormCheckboxPropsT {
-  name: FieldPath<z.infer<typeof formSchema>>;
-  label: string;
-  formControl: Control<z.infer<typeof formSchema>, any>;
-}
-
-const CustomFormCheckbox: React.FC<CustomFormCheckboxPropsT> = ({
-  name,
-  label,
-  formControl,
-}) => {
-  return (
-    <FormField
-      control={formControl}
-      name={name}
-      render={({ field }) => (
-        <FormItem>
-          <FormLabel>{label}</FormLabel>
-          <FormControl>
-            <Checkbox checked={field.value} onCheckedChange={field.onChange} />
-          </FormControl>
-        </FormItem>
-      )}
-    />
   );
 };
