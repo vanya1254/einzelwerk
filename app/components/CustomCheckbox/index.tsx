@@ -26,7 +26,7 @@ export const CustomCheckbox: React.FC<CustomCheckboxPropsT> = ({
         <FormItem className="m0 flex items-center gap-4 pt-1 pb-1">
           <FormControl>
             <Checkbox
-              className="border-gray-200"
+              className="border-gray-200 checked"
               checked={field.value}
               onCheckedChange={field.onChange}
             />

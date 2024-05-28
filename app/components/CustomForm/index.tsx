@@ -29,7 +29,7 @@ export const formSchema = z.object({
     .custom<Option>()
     .array()
     .min(1, { message: "Please choose option(s)" }),
-  files: z.custom<FileList>(),
+  files: z.custom<File>().array().min(1, { message: "Please upload file(s)" }),
   agree: z
     .boolean()
     .refine((val) => val, { message: "Please check the agreement" }),
@@ -43,7 +43,7 @@ export const CustomForm: React.FC = () => {
       phone: "",
       email: "",
       skills: [],
-      files: undefined,
+      files: [],
       agree: false,
     },
   });
@@ -62,7 +62,7 @@ export const CustomForm: React.FC = () => {
           <h1 className="text-gray-950 font-semibold text-[40px]/[44px]">
             Drop us a line
           </h1>
-          <p className="text-xl/[30px] tracking-[-0.2px]">
+          <p className="text-xl/[30px] tracking-[-0.2px] mb-4">
             Our documentary campaigns feature leading figures, organisations and
             leaders, in open and candid discussions.
           </p>
@@ -92,9 +92,11 @@ export const CustomForm: React.FC = () => {
           placeholder="Your skills"
           formControl={form.control}
           options={[
-            { value: "string", label: "string" },
-            { value: "22", label: "22" },
-            { value: "str333ing", label: "str333ing" },
+            { value: "Junior", label: "Junior" },
+            { value: "Middle", label: "Middle" },
+            { value: "Senior", label: "Senior" },
+            { value: "Lead", label: "Lead" },
+            { value: "CTO", label: "CTO" },
           ]}
         />
         <CustomFileUpload formControl={form.control} />
